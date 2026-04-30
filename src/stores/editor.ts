@@ -1,7 +1,7 @@
-import { atom, type WritableAtom } from "nanostores";
-import { createSignal, onCleanup } from "solid-js";
+import { atom, type WritableAtom } from 'nanostores';
+import { createSignal, onCleanup } from 'solid-js';
 
-export type EditorTool = "select" | "brush" | "erase" | "pan";
+export type EditorTool = 'select' | 'brush' | 'erase' | 'pan';
 
 export type EditorState = {
   canvasReady: boolean;
@@ -12,8 +12,8 @@ export type EditorState = {
 
 const initialState: EditorState = {
   canvasReady: false,
-  levelName: "Untitled Level",
-  selectedTool: "select",
+  levelName: 'Untitled Level',
+  selectedTool: 'select',
   zoom: 100,
 };
 

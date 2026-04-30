@@ -26,6 +26,10 @@ Use `pnpm` as the package manager because this repository has a `pnpm-lock.yaml`
 - Keep UI components small and explicit, matching the current SolidJS component structure.
 - Prefer vanilla-extract styles and recipes over ad hoc global CSS.
 - Avoid unrelated refactors, formatting-only churn, and file moves.
+- Biome is the source of truth for formatting and linting.
+- Use single quotes for JavaScript, TypeScript, and JSX string literals.
+- Use trailing commas in multiline JavaScript, TypeScript, and JSX comma-separated syntax.
+- Use JSX braces for string props, such as `foo={'bar'}`, and avoid raw JSX text children.
 - Component implementation folders and files must use kebab-case names, such as `tool-panel/tool-panel.tsx`.
 - Component folders must contain `component-name.tsx`, `component-name.css.ts`, and `index.ts`.
 - Exported TypeScript component identifiers must stay PascalCase, such as `ToolPanel`.
@@ -55,4 +59,5 @@ Use `pnpm` as the package manager because this repository has a `pnpm-lock.yaml`
 - Treat `dist/` as build output. Do not edit it directly unless explicitly requested.
 - Add new dependencies only when necessary, and first check whether the existing libraries can solve the problem.
 - After code changes, verify with `pnpm run build` when practical. A build is not required for documentation-only changes.
+- After all code work is complete, run `pnpm run biome` to finish code cleanup.
 - Check the actual change scope with `git diff` and keep unrelated files out of the change.

@@ -1,1 +1,1 @@
-export { PropertyPanel } from "./property-panel";
+export { PropertyPanel } from './property-panel';

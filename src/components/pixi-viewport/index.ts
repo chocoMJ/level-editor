@@ -1,1 +1,1 @@
-export { PixiViewport } from "./pixi-viewport";
+export { PixiViewport } from './pixi-viewport';

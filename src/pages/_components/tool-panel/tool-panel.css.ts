@@ -1,17 +1,17 @@
-import { vars } from "@suis-ui/kit";
-import { style } from "@vanilla-extract/css";
+import { vars } from '@suis-ui/kit';
+import { style } from '@vanilla-extract/css';
 
 export const panel = style({
-  position: "absolute",
+  position: 'absolute',
   zIndex: 10,
-  left: "50%",
+  left: '50%',
   bottom: vars.size.space.lg,
-  width: "22rem",
+  width: '22rem',
   padding: vars.size.space.md,
   borderRadius: vars.size.space.sm,
   boxShadow: vars.shadow.xl,
-  backdropFilter: "blur(10px)",
-  transform: "translateX(-50%)",
+  backdropFilter: 'blur(10px)',
+  transform: 'translateX(-50%)',
 });
 
 export const panelTitle = style({
@@ -19,21 +19,21 @@ export const panelTitle = style({
   fontWeight: vars.font.title.fontWeight,
   letterSpacing: vars.font.caption.letterSpacing,
   lineHeight: vars.font.caption.lineHeight,
-  textTransform: "uppercase",
+  textTransform: 'uppercase',
 });
 
 export const toolList = style({
-  display: "grid",
+  display: 'grid',
   gap: vars.size.space.xs,
 });
 
 export const toolButton = style({
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  width: "100%",
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
   minHeight: vars.size.space.xl,
-  textAlign: "left",
+  textAlign: 'left',
 });
 
 export const toolShortcut = style({

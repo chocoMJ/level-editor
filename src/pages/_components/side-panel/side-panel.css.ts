@@ -1,24 +1,24 @@
-import { vars } from "@suis-ui/kit";
-import { style } from "@vanilla-extract/css";
+import { vars } from '@suis-ui/kit';
+import { style } from '@vanilla-extract/css';
 
 export const panel = style({
-  position: "absolute",
+  position: 'absolute',
   zIndex: 10,
   top: vars.size.space.lg,
   left: vars.size.space.lg,
-  width: "26rem",
+  width: '26rem',
   padding: vars.size.space.md,
   borderRadius: vars.size.space.sm,
   boxShadow: vars.shadow.xl,
-  backdropFilter: "blur(10px)",
+  backdropFilter: 'blur(10px)',
 });
 
 export const appMark = style({
-  display: "grid",
-  placeItems: "center",
+  display: 'grid',
+  placeItems: 'center',
   width: vars.size.space.xl,
   height: vars.size.space.xl,
-  flex: "0 0 auto",
+  flex: '0 0 auto',
   borderRadius: vars.size.space.sm,
   fontSize: vars.font.caption.fontSize,
   fontWeight: vars.font.title.fontWeight,
@@ -26,26 +26,26 @@ export const appMark = style({
 });
 
 export const brandRow = style({
-  display: "flex",
-  alignItems: "center",
+  display: 'flex',
+  alignItems: 'center',
   gap: vars.size.space.md,
   minWidth: 0,
 });
 
 export const actionRow = style({
-  display: "flex",
-  alignItems: "center",
+  display: 'flex',
+  alignItems: 'center',
   gap: vars.size.space.sm,
   minWidth: 0,
 });
 
 export const title = style({
   margin: 0,
-  overflow: "hidden",
+  overflow: 'hidden',
   fontWeight: vars.font.title.fontWeight,
   lineHeight: vars.font.body.lineHeight,
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 });
 
 export const subtitle = style({
