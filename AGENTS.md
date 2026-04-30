@@ -57,7 +57,7 @@ Use `pnpm` as the package manager because this repository has a `pnpm-lock.yaml`
 
 - Do not revert user changes.
 - Treat `dist/` as build output. Do not edit it directly unless explicitly requested.
-- Add new dependencies only when necessary, and first check whether the existing libraries can solve the problem.
+- Add new dependencies only when necessary, and first check whether the existing libraries can solve the problem. Always pin dependency versions when adding packages.
 - After code changes, verify with `pnpm run build` when practical. A build is not required for documentation-only changes.
 - After all code work is complete, run `pnpm run biome` to finish code cleanup.
 - Check the actual change scope with `git diff` and keep unrelated files out of the change.

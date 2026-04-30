@@ -1,7 +1,7 @@
 import { Box, Button } from '@suis-ui/kit';
 import { For } from 'solid-js';
 
-import type { EditorTool } from '../../../stores/editor';
+import type { EditorTool } from '@/stores/editor';
 import * as styles from './tool-panel.css';
 
 const tools = [

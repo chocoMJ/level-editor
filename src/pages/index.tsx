@@ -1,12 +1,8 @@
+import { useStore } from '@nanostores/solid';
 import { Box } from '@suis-ui/kit';
 
 import { PixiViewport } from '../components/pixi-viewport';
-import {
-  editorStore,
-  setSelectedTool,
-  setZoom,
-  useStore,
-} from '../stores/editor';
+import { editorStore, setSelectedTool, setZoom } from '../stores/editor';
 import { PropertyPanel } from './_components/property-panel';
 import { SidePanel } from './_components/side-panel';
 import { ToolPanel } from './_components/tool-panel';
@@ -26,7 +22,7 @@ export default function HomePage() {
         <PixiViewport zoom={editor().zoom} />
       </Box>
 
-      <SidePanel levelName={editor().levelName} />
+      <SidePanel levelName={'level name'} />
       <ToolPanel
         selectedTool={editor().selectedTool}
         onSelectTool={setSelectedTool}

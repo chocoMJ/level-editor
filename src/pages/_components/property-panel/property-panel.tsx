@@ -1,6 +1,6 @@
 import { Box } from '@suis-ui/kit';
 
-import type { EditorTool } from '../../../stores/editor';
+import type { EditorTool } from '@/stores/editor';
 import * as styles from './property-panel.css';
 
 type PropertyPanelProps = {
