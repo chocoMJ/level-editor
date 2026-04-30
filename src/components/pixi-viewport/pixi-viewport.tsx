@@ -1,9 +1,18 @@
 import { useStore } from '@nanostores/solid';
-import { Box, Button, Popup } from '@suis-ui/kit';
+import { Box, Popup } from '@suis-ui/kit';
+import {
+  ClipboardPaste,
+  Copy,
+  RefreshCcw,
+  SquareDashedMousePointer,
+  Trash2,
+} from 'lucide-solid';
 import { createSignal } from 'solid-js';
 import type { Cell, LevelData } from '@/models/level';
 import { editorStore, setZoom } from '@/stores/editor';
 import type { EditorHistoryAction } from '@/stores/history';
+import { Item } from '../ui/item';
+import { ItemGroup } from '../ui/item/item-group';
 import * as styles from './pixi-viewport.css';
 import type { ContextMenuState, SelectionRect } from './types';
 import { usePixiEditorActions } from './use-pixi-editor-actions';
@@ -104,78 +113,83 @@ export const PixiViewport = (props: PixiViewportProps) => {
         placement={'bottom-start'}
         element={
           <Box
+            minW={'20rem'}
             as={'ul'}
             role={'menu'}
             align={'stretch'}
             bg={'surface.main'}
             bw={'md'}
             bc={'surface.high'}
-            p={'xs'}
-            gap={'xs'}
-            r={'lg'}
+            r={'md'}
           >
-            <Box as={'li'} role={'presentation'}>
-              {`${contextMenu().cell.x}, ${contextMenu().cell.y}`}
-            </Box>
-            <Box as={'li'} role={'none'}>
-              <Button
-                w={'100%'}
-                type={'button'}
-                variant={'ghost'}
-                role={'menuitem'}
-                disabled={selection().length === 0}
-                onClick={input.handleMenuCopy}
+            <ItemGroup>
+              <Item
+                disabled
+                as={'li'}
+                role={'presentation'}
+                title={'선택된 셀'}
               >
-                {'Copy'}
-              </Button>
-            </Box>
-            <Box as={'li'} role={'none'}>
-              <Button
-                w={'100%'}
-                type={'button'}
-                variant={'ghost'}
-                role={'menuitem'}
-                disabled={!clipboard()}
-                onClick={input.handleMenuPaste}
-              >
-                {'Paste'}
-              </Button>
-            </Box>
-            <Box as={'li'} role={'none'}>
-              <Button
-                w={'100%'}
-                type={'button'}
-                variant={'ghost'}
-                role={'menuitem'}
-                disabled={isDeleteDisabled()}
-                onClick={input.handleMenuDelete}
-              >
-                {'Delete'}
-              </Button>
-            </Box>
-            <Box as={'li'} role={'none'}>
-              <Button
-                w={'100%'}
-                type={'button'}
-                variant={'ghost'}
-                role={'menuitem'}
-                disabled={selection().length === 0}
-                onClick={input.handleClearSelection}
-              >
-                {'Clear Selection'}
-              </Button>
-            </Box>
-            <Box as={'li'} role={'none'}>
-              <Button
-                w={'100%'}
-                type={'button'}
-                variant={'ghost'}
-                role={'menuitem'}
-                onClick={input.handleResetView}
-              >
-                {'Reset View'}
-              </Button>
-            </Box>
+                {`${contextMenu().cell.x}, ${contextMenu().cell.y}`}
+              </Item>
+            </ItemGroup>
+            <ItemGroup>
+              <Box as={'li'} role={'none'}>
+                <Item
+                  icon={Copy}
+                  title={'복사'}
+                  role={'menuitem'}
+                  disabled={selection().length === 0}
+                  onClick={input.handleMenuCopy}
+                >
+                  {'⌘C'}
+                </Item>
+              </Box>
+              <Box as={'li'} role={'none'}>
+                <Item
+                  icon={ClipboardPaste}
+                  title={'붙여넣기'}
+                  role={'menuitem'}
+                  disabled={!clipboard()}
+                  onClick={input.handleMenuPaste}
+                >
+                  {'⌘V'}
+                </Item>
+              </Box>
+              <Box as={'li'} role={'none'}>
+                <Item
+                  icon={Trash2}
+                  title={'삭제'}
+                  role={'menuitem'}
+                  disabled={isDeleteDisabled()}
+                  onClick={input.handleMenuDelete}
+                >
+                  {'⌫'}
+                </Item>
+              </Box>
+            </ItemGroup>
+            <ItemGroup>
+              <Box as={'li'} role={'none'}>
+                <Item
+                  icon={SquareDashedMousePointer}
+                  title={'선택 해제'}
+                  role={'menuitem'}
+                  disabled={selection().length === 0}
+                  onClick={input.handleClearSelection}
+                >
+                  {'⌘D'}
+                </Item>
+              </Box>
+              <Box as={'li'} role={'none'}>
+                <Item
+                  icon={RefreshCcw}
+                  title={'뷰 초기화'}
+                  role={'menuitem'}
+                  onClick={input.handleResetView}
+                >
+                  {'⌘R'}
+                </Item>
+              </Box>
+            </ItemGroup>
           </Box>
         }
       >
