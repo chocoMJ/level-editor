@@ -158,6 +158,9 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+.venv/
+classify_module/debug_segments/
+classify_module/form_data.json
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
