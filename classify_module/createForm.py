@@ -54,17 +54,6 @@ def make_form_data_item(segment, segment_type, original_height, original_width, 
     "filename": "triangle_{label_id}.png",
     "content": png_bytes,
     "content_type": "image/png",
-
-
-
-    structure의 경우 다음 추가
-    "points": [
-        {
-            "x": int,
-            "y": int,
-        },
-        ...
-    ],
     """
 
     if tile_count <= 0:
@@ -105,6 +94,7 @@ def make_form_data_item(segment, segment_type, original_height, original_width, 
         "image_filename": filename,
     }
 
+    """
     if segment_type in ["triangle", "star"]:
         # 별 / 삼각형은 오브젝트 하나만 소환하므로 tile_pos 하나만 사용
         pass
@@ -138,6 +128,7 @@ def make_form_data_item(segment, segment_type, original_height, original_width, 
 
     else:
         raise ValueError(f"알 수 없는 segment_type입니다: {segment_type}")
+    """
 
     # 확인용 이미지 파일
     display_crop = 255 - crop
