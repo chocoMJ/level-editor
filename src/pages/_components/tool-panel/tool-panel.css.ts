@@ -19,3 +19,12 @@ export const containerStyle = style({
 export const groupStyle = style({
   backdropFilter: 'blur(8px)',
 });
+
+export const paletteGroupEnterStyle = style({
+  opacity: 0,
+});
+
+export const paletteGroupExitStyle = style({
+  position: 'absolute',
+  opacity: 0,
+});

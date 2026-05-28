@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@suis-ui/kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
+import { FlipProvider } from 'solid-flip';
 import { render } from 'solid-js/web';
 
 import { App } from './app';
@@ -18,7 +19,9 @@ render(
   () => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <App />
+        <FlipProvider>
+          <App />
+        </FlipProvider>
       </ThemeProvider>
     </QueryClientProvider>
   ),

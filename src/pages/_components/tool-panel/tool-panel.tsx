@@ -8,7 +8,8 @@ import {
   Redo2,
   Undo2,
 } from 'lucide-solid';
-import { For, type JSX } from 'solid-js';
+import { Flip } from 'solid-flip';
+import { For, type JSX, Show } from 'solid-js';
 
 import { Icon, type IconType } from '@/components/ui/icon';
 import type { TileMapping } from '@/models/level';
@@ -18,10 +19,10 @@ import { getTileDisplayName } from '@/stores/palette';
 import * as styles from './tool-panel.css';
 
 const tools = [
-  { id: 'select', label: 'Select', icon: MousePointer2 },
-  { id: 'brush', label: 'Brush', icon: Paintbrush },
-  { id: 'erase', label: 'Erase', icon: Eraser },
-  { id: 'pan', label: 'Pan', icon: Hand },
+  { id: 'select', label: '선택', icon: MousePointer2 },
+  { id: 'brush', label: '브러시', icon: Paintbrush },
+  { id: 'erase', label: '지우개', icon: Eraser },
+  { id: 'pan', label: '팬', icon: Hand },
 ] as const satisfies ReadonlyArray<{
   id: EditorTool;
   label: string;
@@ -107,119 +108,148 @@ export function ToolPanel(props: ToolPanelProps) {
         onChange={handleRecognitionImageChange}
       />
 
-      <Box
-        class={styles.groupStyle}
-        direction={'row'}
-        p={'xs'}
-        gap={'sm'}
-        r={'md'}
-        bg={'surface.high'}
-        bc={'surface.higher'}
-        bd={'thin'}
-        shadow={'md'}
-        aria-label={'Editor toolbar'}
+      <Flip
+        id={'toolbar-history-actions'}
+        with={props.selectedTool}
+        properties={'translate'}
       >
-        <Box direction={'row'} aria-label={'History actions'}>
+        <Box
+          class={styles.groupStyle}
+          direction={'row'}
+          p={'xs'}
+          gap={'sm'}
+          r={'md'}
+          bg={'surface.high'}
+          bc={'surface.higher'}
+          bd={'thin'}
+          shadow={'md'}
+          aria-label={'Editor toolbar'}
+        >
+          <Box direction={'row'} aria-label={'History actions'}>
+            <ToolbarIconButton
+              icon={Undo2}
+              label={'실행 취소'}
+              disabled={!props.canUndo}
+              onClick={props.onUndo}
+            />
+            <ToolbarIconButton
+              icon={Redo2}
+              label={'다시 실행'}
+              disabled={!props.canRedo}
+              onClick={props.onRedo}
+            />
+          </Box>
+        </Box>
+      </Flip>
+
+      <Flip
+        id={'toolbar-recognition-action'}
+        with={props.selectedTool}
+        properties={'translate'}
+      >
+        <Box
+          class={styles.groupStyle}
+          direction={'row'}
+          p={'xs'}
+          gap={'sm'}
+          r={'md'}
+          bg={'surface.high'}
+          bc={'surface.higher'}
+          bd={'thin'}
+          shadow={'md'}
+          aria-label={'이미지 인식'}
+        >
           <ToolbarIconButton
-            icon={Undo2}
-            label={'실행 취소'}
-            disabled={!props.canUndo}
-            onClick={props.onUndo}
-          />
-          <ToolbarIconButton
-            icon={Redo2}
-            label={'다시 실행'}
-            disabled={!props.canRedo}
-            onClick={props.onRedo}
+            icon={Plus}
+            label={'이미지 인식'}
+            disabled={props.recognitionImportPending}
+            onClick={handleOpenRecognitionImageInput}
           />
         </Box>
-      </Box>
+      </Flip>
 
-      <Box
-        class={styles.groupStyle}
-        direction={'row'}
-        p={'xs'}
-        gap={'sm'}
-        r={'md'}
-        bg={'surface.high'}
-        bc={'surface.higher'}
-        bd={'thin'}
-        shadow={'md'}
-        aria-label={'이미지 인식'}
+      <Flip
+        id={'toolbar-editor-tools'}
+        with={props.selectedTool}
+        properties={'translate'}
       >
-        <ToolbarIconButton
-          icon={Plus}
-          label={'이미지 인식'}
-          disabled={props.recognitionImportPending}
-          onClick={handleOpenRecognitionImageInput}
-        />
-      </Box>
-
-      <Box
-        class={styles.groupStyle}
-        direction={'row'}
-        p={'xs'}
-        gap={'sm'}
-        r={'md'}
-        bg={'surface.high'}
-        bc={'surface.higher'}
-        bd={'thin'}
-        shadow={'md'}
-        aria-label={'에디터 도구 모음'}
-      >
-        <Box direction={'row'} aria-label={'에디터 모드'}>
-          <For each={tools}>
-            {(tool) => (
-              <ToolbarIconButton
-                icon={tool.icon}
-                label={tool.label}
-                active={props.selectedTool === tool.id}
-                onClick={() => props.onSelectTool(tool.id)}
-              />
-            )}
-          </For>
+        <Box
+          class={styles.groupStyle}
+          direction={'row'}
+          p={'xs'}
+          gap={'sm'}
+          r={'md'}
+          bg={'surface.high'}
+          bc={'surface.higher'}
+          bd={'thin'}
+          shadow={'md'}
+          aria-label={'에디터 도구 모음'}
+        >
+          <Box direction={'row'} aria-label={'에디터 모드'}>
+            <For each={tools}>
+              {(tool) => (
+                <ToolbarIconButton
+                  icon={tool.icon}
+                  label={tool.label}
+                  active={props.selectedTool === tool.id}
+                  onClick={() => props.onSelectTool(tool.id)}
+                />
+              )}
+            </For>
+          </Box>
         </Box>
-      </Box>
+      </Flip>
 
-      <Box
-        class={styles.groupStyle}
-        direction={'row'}
-        p={'xs'}
-        gap={'sm'}
-        r={'md'}
-        bg={'surface.high'}
-        bc={'surface.higher'}
-        bd={'thin'}
-        shadow={'md'}
-        aria-label={'브러시 타일 선택기'}
-      >
-        <Box direction={'row'} aria-label={'브러시 타일'}>
-          <For each={props.tileTable}>
-            {(tile) => (
-              <Tooltip
-                content={<Box text={'caption'}>{getTileDisplayName(tile)}</Box>}
-                placement={'top'}
-                withArrow
-                offset={12}
-              >
-                <Button
-                  variant={'ghost'}
-                  size={'md'}
-                  p={'none'}
-                  type={'icon'}
-                  aria-label={`Use ${getTileDisplayName(tile)} brush`}
-                  onClick={() => props.onSelectBrushTile(tile.tileId)}
-                  style={{
-                    opacity: props.selectedBrushTileId !== tile.tileId ? 0.25 : 1,
-                  }}
-                >
-                  <TilePreview tile={tile} size={16} />
-                </Button>
-              </Tooltip>
-            )}
-          </For>
-        </Box>
-      </Box>
+      <Show when={props.selectedTool === 'brush'}>
+        <Flip
+          id={'toolbar-brush-palette'}
+          with={props.selectedTool}
+          preserve={'all'}
+          enter={styles.paletteGroupEnterStyle}
+          exit={styles.paletteGroupExitStyle}
+        >
+          <Box
+            class={styles.groupStyle}
+            direction={'row'}
+            p={'xs'}
+            gap={'sm'}
+            r={'md'}
+            bg={'surface.high'}
+            bc={'surface.higher'}
+            bd={'thin'}
+            shadow={'md'}
+            aria-label={'브러시 타일 선택기'}
+          >
+            <Box direction={'row'} aria-label={'브러시 타일'}>
+              <For each={props.tileTable}>
+                {(tile) => (
+                  <Tooltip
+                    content={getTileDisplayName(tile)}
+                    placement={'top'}
+                    withArrow
+                    offset={12}
+                  >
+                    <Button
+                      variant={'ghost'}
+                      size={'md'}
+                      p={'none'}
+                      type={'icon'}
+                      aria-label={`Use ${getTileDisplayName(tile)} brush`}
+                      onClick={() => props.onSelectBrushTile(tile.tileId)}
+                      style={{
+                        opacity:
+                          props.selectedBrushTileId !== tile.tileId ? 0.25 : 1,
+                      }}
+                    >
+                      <TilePreview tile={tile} size={16} />
+                    </Button>
+                  </Tooltip>
+                )}
+              </For>
+            </Box>
+          </Box>
+        </Flip>
+      </Show>
     </Box>
   );
 }

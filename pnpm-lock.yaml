@@ -44,6 +44,9 @@ importers:
       pixi.js:
         specifier: 8.18.1
         version: 8.18.1
+      solid-flip:
+        specifier: 0.5.2
+        version: 0.5.2(solid-js@1.9.12)
       solid-js:
         specifier: 1.9.12
         version: 1.9.12
@@ -976,6 +979,12 @@ packages:
   seroval@1.5.2:
     resolution: {integrity: sha512-xcRN39BdsnO9Tf+VzsE7b3JyTJASItIV1FVFewJKCFcW4s4haIKS3e6vj8PGB9qBwC7tnuOywQMdv5N4qkzi7Q==}
     engines: {node: '>=10'}
+
+  solid-flip@0.5.2:
+    resolution: {integrity: sha512-prcyIPTiiqkRjmIv/jkpEu6P9X9DK2gtgWWNXd+VBHz0hnVNYSXPyvMI8eNCheGoOAULmhxle7g9PhgKOnWvHg==}
+    engines: {node: '>=20', pnpm: '>=9'}
+    peerDependencies:
+      solid-js: '*'
 
   solid-js@1.9.12:
     resolution: {integrity: sha512-QzKaSJq2/iDrWR1As6MHZQ8fQkdOBf8GReYb7L5iKwMGceg7HxDcaOHk0at66tNgn9U2U7dXo8ZZpLIAmGMzgw==}
@@ -1941,6 +1950,10 @@ snapshots:
       seroval: 1.5.2
 
   seroval@1.5.2: {}
+
+  solid-flip@0.5.2(solid-js@1.9.12):
+    dependencies:
+      solid-js: 1.9.12
 
   solid-js@1.9.12:
     dependencies:

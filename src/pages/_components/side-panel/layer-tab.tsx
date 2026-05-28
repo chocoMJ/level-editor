@@ -1,22 +1,24 @@
-import { Box, Button, CheckBox, Item, Popup, Tooltip } from '@suis-ui/kit';
+import { Box, Button, Item } from '@suis-ui/kit';
 import {
-  ArrowDown,
-  ArrowUp,
   ChevronDown,
   ChevronUp,
   EllipsisVertical,
-  MoreVertical,
   Plus,
   Square,
   Trash2,
 } from 'lucide-solid';
+import { Flip } from 'solid-flip';
 import { createMemo, createSignal, For, Show } from 'solid-js';
 
 import { Dialog } from '@/components/ui/dialog';
-import type { IconType } from '@/components/ui/icon';
 import { Icon } from '@/components/ui/icon';
 import { MenuButton } from '@/components/ui/menu-button';
-import type { LevelData, LevelLayer, TileMapping } from '@/models/level';
+import type {
+  LevelData,
+  LevelLayer,
+  TileMapping,
+  TilePlacement,
+} from '@/models/level';
 import type { LayerMoveDirection } from '@/stores/layers';
 import { sortLayersForDisplay } from '@/stores/layers';
 import { createDefaultTileName, getTileDisplayName } from '@/stores/palette';
@@ -35,10 +37,41 @@ type LayerTabProps = {
 
 export const LayerTab = (props: LayerTabProps) => {
   const [deleteTargetId, setDeleteTargetId] = createSignal<string | null>(null);
+  const [expandedLayerIds, setExpandedLayerIds] = createSignal<Set<string>>(
+    new Set(),
+  );
   const layers = createMemo(() => sortLayersForDisplay(props.level.layers));
+  const layerTreeFlipKey = createMemo(() =>
+    layers()
+      .map((layer) =>
+        [
+          layer.id,
+          layer.order,
+          expandedLayerIds().has(layer.id) ? 'open' : 'closed',
+          layer.tiles
+            .map((tile) => `${tile.x},${tile.y},${tile.tileId}`)
+            .join('|'),
+        ].join(':'),
+      )
+      .join(';'),
+  );
   const deleteTarget = createMemo(() =>
     props.level.layers.find((layer) => layer.id === deleteTargetId()),
   );
+  const isLayerExpanded = (layerId: string) => expandedLayerIds().has(layerId);
+  const toggleLayerExpanded = (layerId: string) => {
+    setExpandedLayerIds((current) => {
+      const next = new Set(current);
+
+      if (next.has(layerId)) {
+        next.delete(layerId);
+      } else {
+        next.add(layerId);
+      }
+
+      return next;
+    });
+  };
   const handleCloseDelete = () => {
     setDeleteTargetId(null);
   };
@@ -49,8 +82,15 @@ export const LayerTab = (props: LayerTabProps) => {
       return;
     }
 
-    props.onDeleteLayer(targetId);
+    setExpandedLayerIds((current) => {
+      const next = new Set(current);
+
+      next.delete(targetId);
+
+      return next;
+    });
     handleCloseDelete();
+    props.onDeleteLayer(targetId);
   };
 
   return (
@@ -80,11 +120,14 @@ export const LayerTab = (props: LayerTabProps) => {
               canMoveDown={index() < layers().length - 1}
               canMoveUp={index() > 0}
               disabledDelete={layers().length <= 1}
+              expanded={isLayerExpanded(layer.id)}
+              flipTrigger={layerTreeFlipKey()}
               selectedLayerId={props.selectedLayerId}
               onDeleteLayer={setDeleteTargetId}
               onMoveLayer={props.onMoveLayer}
               onSelectActiveLayer={props.onSelectActiveLayer}
               onSelectLayerRect={props.onSelectLayerRect}
+              onToggleExpanded={toggleLayerExpanded}
             />
           )}
         </For>
@@ -123,6 +166,8 @@ type LayerItemProps = {
   canMoveDown: boolean;
   canMoveUp: boolean;
   disabledDelete: boolean;
+  expanded: boolean;
+  flipTrigger: string;
   layer: LevelLayer;
   tileTable: TileMapping[];
   activeLayerId?: string;
@@ -131,42 +176,13 @@ type LayerItemProps = {
   onMoveLayer: (layerId: string, direction: LayerMoveDirection) => void;
   onSelectActiveLayer: (layerId: string) => void;
   onSelectLayerRect: (layerId: string, selected: boolean) => void;
+  onToggleExpanded: (layerId: string) => void;
 };
 
-type LayerActionButtonProps = {
-  disabled?: boolean;
-  icon: IconType;
-  label: string;
-  onClick: () => void;
-};
-
-const LayerActionButton = (props: LayerActionButtonProps) => (
-  <Tooltip
-    content={<Box text={'caption'}>{props.label}</Box>}
-    placement={'top'}
-    withArrow
-    offset={8}
-  >
-    <Box as={'span'} direction={'row'}>
-      <Button
-        variant={'ghost'}
-        type={'icon'}
-        size={'sm'}
-        aria-label={props.label}
-        disabled={props.disabled}
-        onClick={(event) => {
-          event.stopPropagation();
-          props.onClick();
-        }}
-      >
-        <Icon name={props.icon} />
-      </Button>
-    </Box>
-  </Tooltip>
-);
+const getTileFlipId = (layerId: string, tile: TilePlacement) =>
+  `side-panel-layer-${layerId}-tile-${tile.x}-${tile.y}`;
 
 const LayerItem = (props: LayerItemProps) => {
-  const [expand, setExpand] = createSignal(false);
   const tileNameById = createMemo(
     () =>
       new Map(
@@ -175,124 +191,139 @@ const LayerItem = (props: LayerItemProps) => {
   );
   const getTileName = (tileId: number) =>
     tileNameById().get(tileId) ?? createDefaultTileName(tileId);
-  // const handleClick = () => {
-  // };
 
   return (
-    <Box as={'li'}>
-      <Box direction={'row'} align={'center'} gap={'xxs'}>
-        <Item
-          as={Button}
-          flex
-          variant={'ghost'}
-          active={props.selectedLayerId === props.layer.id}
-          onClick={() =>
-            props.onSelectLayerRect(
-              props.layer.id,
-              props.selectedLayerId !== props.layer.id,
-            )
-          }
-          media={
-            <Box direction={'row'} align={'center'} gap={'xxs'}>
-              <Box>
-                <Button
-                  variant={'ghost'}
-                  type={'icon'}
-                  size={'xs'}
-                  disabled={!props.canMoveUp}
-                  onClick={() => props.onMoveLayer(props.layer.id, 'up')}
-                >
-                  <Icon name={ChevronUp} size={12} />
-                </Button>
-                <Button
-                  variant={'ghost'}
-                  type={'icon'}
-                  size={'xs'}
-                  disabled={!props.canMoveDown}
-                  onClick={() => props.onMoveLayer(props.layer.id, 'down')}
-                >
-                  <Icon name={ChevronDown} size={12} />
-                </Button>
-              </Box>
-            </Box>
-          }
-          title={
-            <Box
-              direction={'row'}
-              justify={'flex-start'}
-              align={'center'}
-              gap={'xs'}
-            >
-              <Box as={'span'}>{props.layer.name}</Box>
-            </Box>
-          }
-          description={props.layer.id}
-          action={
-            <Box direction={'row'} align={'center'} gap={'xxs'}>
-              <Button
-                variant={'ghost'}
-                type={'icon'}
-                size={'xs'}
-                r={'sm'}
-                onClick={(event) => {
-                  props.onSelectActiveLayer(props.layer.id);
-                  setExpand((prev) => !prev);
-                  event.stopPropagation();
-                }}
-              >
-                <Icon name={expand() ? ChevronUp : ChevronDown} />
-              </Button>
-              <MenuButton
-                variant={'ghost'}
-                type={'icon'}
-                size={'xs'}
-                r={'sm'}
-                items={[
-                  {
-                    label: '레이어 삭제',
-                    icon: Trash2,
-                    onClick: () => props.onDeleteLayer(props.layer.id),
-                  },
-                ]}
-                onClick={(event) => {
-                  event.stopPropagation();
-                }}
-              >
-                <Icon name={EllipsisVertical} />
-              </MenuButton>
-            </Box>
-          }
-        />
-      </Box>
-      <Show when={expand()}>
-        <Box as={'ul'} pl={'md'}>
-          <For each={props.layer.tiles}>
-            {(tile) => (
-              <Item
-                as={'li'}
-                class={styles.tileItem}
-                media={<Icon name={Square} />}
-                title={
-                  <Box
-                    direction={'row'}
-                    justify={'flex-start'}
-                    align={'center'}
-                    gap={'xs'}
+    <Flip
+      id={`side-panel-layer-${props.layer.id}`}
+      with={props.flipTrigger}
+      properties={['translate', 'opacity']}
+      enter={styles.treeItemEnterStyle}
+      exit={styles.treeItemExitStyle}
+    >
+      <Box as={'li'}>
+        <Box direction={'row'} align={'center'} gap={'xxs'}>
+          <Item
+            as={Button}
+            flex
+            variant={'ghost'}
+            active={props.selectedLayerId === props.layer.id}
+            onClick={() =>
+              props.onSelectLayerRect(
+                props.layer.id,
+                props.selectedLayerId !== props.layer.id,
+              )
+            }
+            media={
+              <Box direction={'row'} align={'center'} gap={'xxs'}>
+                <Box>
+                  <Button
+                    variant={'ghost'}
+                    type={'icon'}
+                    size={'xs'}
+                    disabled={!props.canMoveUp}
+                    onClick={() => props.onMoveLayer(props.layer.id, 'up')}
                   >
-                    <Box as={'span'}>{getTileName(tile.tileId)}</Box>
-                    <Box
-                      as={'span'}
-                      text={'caption'}
-                      c={'text.caption'}
-                    >{`#${tile.tileId} / ${tile.x}, ${tile.y}`}</Box>
-                  </Box>
-                }
+                    <Icon name={ChevronUp} size={12} />
+                  </Button>
+                  <Button
+                    variant={'ghost'}
+                    type={'icon'}
+                    size={'xs'}
+                    disabled={!props.canMoveDown}
+                    onClick={() => props.onMoveLayer(props.layer.id, 'down')}
+                  >
+                    <Icon name={ChevronDown} size={12} />
+                  </Button>
+                </Box>
+              </Box>
+            }
+            title={
+              <Box
+                direction={'row'}
                 justify={'flex-start'}
-              />
-            )}
-          </For>
+                align={'center'}
+                gap={'xs'}
+              >
+                <Box as={'span'}>{props.layer.name}</Box>
+              </Box>
+            }
+            description={props.layer.id}
+            action={
+              <Box direction={'row'} align={'center'} gap={'xxs'}>
+                <Button
+                  variant={'ghost'}
+                  type={'icon'}
+                  size={'xs'}
+                  r={'sm'}
+                  onClick={(event) => {
+                    props.onSelectActiveLayer(props.layer.id);
+                    props.onToggleExpanded(props.layer.id);
+                    event.stopPropagation();
+                  }}
+                >
+                  <Icon name={props.expanded ? ChevronUp : ChevronDown} />
+                </Button>
+                <MenuButton
+                  variant={'ghost'}
+                  type={'icon'}
+                  size={'xs'}
+                  r={'sm'}
+                  items={[
+                    {
+                      label: '레이어 삭제',
+                      icon: Trash2,
+                      onClick: () => props.onDeleteLayer(props.layer.id),
+                    },
+                  ]}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
+                  <Icon name={EllipsisVertical} />
+                </MenuButton>
+              </Box>
+            }
+          />
         </Box>
-      </Show>
-    </Box>
+        <Show when={props.expanded}>
+          <Box as={'ul'} pl={'md'}>
+            <For each={props.layer.tiles}>
+              {(tile) => (
+                <Flip
+                  id={getTileFlipId(props.layer.id, tile)}
+                  with={props.flipTrigger}
+                  properties={['translate', 'opacity']}
+                  enter={styles.treeItemEnterStyle}
+                  exit={styles.treeItemExitStyle}
+                >
+                  <Box as={'li'} class={styles.tileNode}>
+                    <Item
+                      class={styles.tileItem}
+                      media={<Icon name={Square} />}
+                      title={
+                        <Box
+                          direction={'row'}
+                          justify={'flex-start'}
+                          align={'center'}
+                          gap={'xs'}
+                        >
+                          <Box as={'span'}>{getTileName(tile.tileId)}</Box>
+                          <Box
+                            as={'span'}
+                            text={'caption'}
+                            c={'text.caption'}
+                          >{`#${tile.tileId} / ${tile.x}, ${tile.y}`}</Box>
+                        </Box>
+                      }
+                      justify={'flex-start'}
+                    />
+                  </Box>
+                </Flip>
+              )}
+            </For>
+          </Box>
+        </Show>
+      </Box>
+    </Flip>
   );
 };

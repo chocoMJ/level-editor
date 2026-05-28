@@ -25,6 +25,27 @@ export const tabButton = style({
   justifyContent: 'center',
 });
 
+export const pagerViewport = style({
+  minWidth: 0,
+  overflowX: 'hidden',
+});
+
+export const pagerTrack = style({
+  display: 'flex',
+  alignItems: 'flex-start',
+  width: '200%',
+  transitionDuration: '220ms',
+  transitionProperty: 'transform',
+  transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  willChange: 'transform',
+});
+
+export const pagerPage = style({
+  width: '50%',
+  minWidth: 0,
+  flex: '0 0 50%',
+});
+
 export const paletteList = style({
   display: 'flex',
   flexDirection: 'column',
@@ -180,6 +201,16 @@ export const tileList = style({
 
 export const tileNode = style({
   display: 'block',
+});
+
+export const treeItemEnterStyle = style({
+  opacity: 0,
+  translate: `0 ${vars.size.space.xxs}`,
+});
+
+export const treeItemExitStyle = style({
+  opacity: 0,
+  translate: `0 calc(${vars.size.space.xxs} * -1)`,
 });
 
 export const tileItem = style({

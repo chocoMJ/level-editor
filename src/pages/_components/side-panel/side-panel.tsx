@@ -1,6 +1,6 @@
 import { Box, Button } from '@suis-ui/kit';
 import { Menu } from 'lucide-solid';
-import { createSignal, For, Show } from 'solid-js';
+import { createSignal, For } from 'solid-js';
 
 import { Icon } from '@/components/ui/icon';
 import type { LevelData } from '@/models/level';
@@ -10,6 +10,8 @@ import { PaletteTab } from './palette-tab';
 import * as styles from './side-panel.css';
 
 type SidePanelTab = 'layer' | 'palette';
+
+const sidePanelTabs = ['layer', 'palette'] as const satisfies SidePanelTab[];
 
 type SidePanelProps = {
   activeLayerId: string;
@@ -27,6 +29,11 @@ type SidePanelProps = {
 
 export const SidePanel = (props: SidePanelProps) => {
   const [activeTab, setActiveTab] = createSignal<SidePanelTab>('layer');
+  const getTabIndex = (tab: SidePanelTab) => sidePanelTabs.indexOf(tab);
+  const activeTabIndex = () => getTabIndex(activeTab());
+  const selectTab = (tab: SidePanelTab) => {
+    setActiveTab(tab);
+  };
 
   return (
     <Box
@@ -60,7 +67,7 @@ export const SidePanel = (props: SidePanelProps) => {
         role={'tablist'}
         aria-label={'Sidebar tabs'}
       >
-        <For each={['layer', 'palette'] as SidePanelTab[]}>
+        <For each={sidePanelTabs}>
           {(tab) => (
             <Button
               flex
@@ -68,35 +75,54 @@ export const SidePanel = (props: SidePanelProps) => {
               active={activeTab() === tab}
               aria-selected={activeTab() === tab}
               role={'tab'}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => selectTab(tab)}
             >
               {tab === 'layer' ? 'Layer' : 'Palette'}
             </Button>
           )}
         </For>
       </Box>
-      <Show
-        when={activeTab() === 'palette'}
-        fallback={
-          <LayerTab
-            activeLayerId={props.activeLayerId}
-            selectedLayerId={props.selectedLayerId}
-            level={props.level}
-            onAddLayer={props.onAddLayer}
-            onDeleteLayer={props.onDeleteLayer}
-            onMoveLayer={props.onMoveLayer}
-            onSelectActiveLayer={props.onSelectActiveLayer}
-            onSelectLayerRect={props.onSelectLayerRect}
-          />
-        }
-      >
-        <PaletteTab
-          level={props.level}
-          selectedBrushTileId={props.selectedBrushTileId}
-          onApplyLevel={props.onApplyLevel}
-          onSelectBrushTile={props.onSelectBrushTile}
-        />
-      </Show>
+      <Box class={styles.pagerViewport}>
+        <Box
+          class={styles.pagerTrack}
+          style={{
+            transform: `translateX(${activeTabIndex() * -50}%)`,
+          }}
+        >
+          <Box
+            class={styles.pagerPage}
+            aria-hidden={activeTab() !== 'layer'}
+            style={{
+              'pointer-events': activeTab() === 'layer' ? 'auto' : 'none',
+            }}
+          >
+            <LayerTab
+              activeLayerId={props.activeLayerId}
+              selectedLayerId={props.selectedLayerId}
+              level={props.level}
+              onAddLayer={props.onAddLayer}
+              onDeleteLayer={props.onDeleteLayer}
+              onMoveLayer={props.onMoveLayer}
+              onSelectActiveLayer={props.onSelectActiveLayer}
+              onSelectLayerRect={props.onSelectLayerRect}
+            />
+          </Box>
+          <Box
+            class={styles.pagerPage}
+            aria-hidden={activeTab() !== 'palette'}
+            style={{
+              'pointer-events': activeTab() === 'palette' ? 'auto' : 'none',
+            }}
+          >
+            <PaletteTab
+              level={props.level}
+              selectedBrushTileId={props.selectedBrushTileId}
+              onApplyLevel={props.onApplyLevel}
+              onSelectBrushTile={props.onSelectBrushTile}
+            />
+          </Box>
+        </Box>
+      </Box>
     </Box>
   );
 };
