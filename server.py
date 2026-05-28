@@ -21,6 +21,7 @@ app = FastAPI(title='Level Editor Recognition API')
 classifier: ShapeClassifier | None = None
 
 
+# 분류 모델 로드
 def get_classifier():
     global classifier
 
@@ -36,6 +37,7 @@ def get_classifier():
     return classifier
 
 
+# 업로드된 이미지 바이트를 OpenCV가 다루는 BGR 이미지로 디코딩.
 def decode_upload_image(content: bytes):
     image_buffer = np.frombuffer(content, dtype=np.uint8)
     image = cv2.imdecode(image_buffer, cv2.IMREAD_COLOR)
@@ -49,11 +51,13 @@ def decode_upload_image(content: bytes):
     return image
 
 
+# 테스트 확인을 위해 생성된 인식 metadata를 파일로 저장한다.
 def write_metadata_file(metadata_list):
     with METADATA_OUTPUT_PATH.open('w', encoding='utf-8') as file:
         json.dump(metadata_list, file, ensure_ascii=False, indent=4)
 
 
+# 업로드 이미지를 받아 현재 segmentation/classification 흐름을 실행한다.
 @app.post('/api/recognitions')
 async def create_recognition(image: UploadFile = File(...)):
     if not image.content_type or not image.content_type.startswith('image/'):
@@ -76,9 +80,10 @@ async def create_recognition(image: UploadFile = File(...)):
     original_height, original_width = uploaded_image.shape[:2]
     metadata_list = []
 
+    #FormData 생성 부분
     for segment in segments:
         segment_type = current_classifier.predict_crop(segment['crop'])
-        metadata, _file_item = make_form_data_item(
+        metadata, _file_item = make_form_data_item( 
             segment=segment,
             segment_type=segment_type,
             original_height=original_height,
