@@ -1,4 +1,9 @@
-import { type CvShape, type LevelData, LevelDataSchema } from '@/models/level';
+import {
+  type CvShape,
+  type LevelData,
+  LevelDataSchema,
+  type TileIcon,
+} from '@/models/level';
 import { isCvShape, normalizeCvShape } from './palette';
 
 const LEVEL_FILE_EXTENSION = '.level.json';
@@ -7,6 +12,13 @@ export const LEVEL_FILE_ACCEPT = 'application/json,.json,.level.json';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const LEGACY_TILE_ICON_MAP: Partial<Record<string, TileIcon>> = {
+  line: 'hash',
+  door: 'structure',
+  window: 'plus',
+  stairs: 'arrow',
+};
 
 export const sanitizeFileName = (value: string) => {
   const fileName = value
@@ -47,6 +59,14 @@ const normalizeLegacyCvShapes = (
   return normalizedShapes;
 };
 
+const normalizeLegacyTileIcon = (icon: unknown) => {
+  if (typeof icon !== 'string') {
+    return icon;
+  }
+
+  return LEGACY_TILE_ICON_MAP[icon] ?? icon;
+};
+
 const normalizeLegacyTileMapping = (
   tileMapping: unknown,
   mappedShapes: Set<CvShape>,
@@ -57,6 +77,7 @@ const normalizeLegacyTileMapping = (
 
   return {
     ...tileMapping,
+    icon: normalizeLegacyTileIcon(tileMapping.icon),
     cvShapes: normalizeLegacyCvShapes(tileMapping.cvShapes, mappedShapes),
     isTerrain:
       typeof tileMapping.isTerrain === 'boolean'

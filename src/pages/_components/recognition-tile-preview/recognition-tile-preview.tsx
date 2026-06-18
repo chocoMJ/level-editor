@@ -178,7 +178,18 @@ const drawTriangleIcon = (
   context.stroke();
 };
 
-const drawLineIcon = (
+const drawStructureIcon = (
+  context: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  radius: number,
+) => {
+  const size = radius * 1.8;
+
+  context.strokeRect(centerX - size / 2, centerY - size / 2, size, size);
+};
+
+const drawPlusIcon = (
   context: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
@@ -187,67 +198,47 @@ const drawLineIcon = (
   context.beginPath();
   context.moveTo(centerX - radius, centerY);
   context.lineTo(centerX + radius, centerY);
+  context.moveTo(centerX, centerY - radius);
+  context.lineTo(centerX, centerY + radius);
   context.stroke();
 };
 
-const drawDoorIcon = (
+const drawHashIcon = (
   context: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   radius: number,
 ) => {
-  const width = radius * 1.05;
-  const height = radius * 1.55;
+  const offset = radius * 0.34;
 
-  context.strokeRect(centerX - width / 2, centerY - height / 2, width, height);
   context.beginPath();
-  context.arc(
-    centerX + width * 0.22,
-    centerY,
-    Math.max(radius * 0.08, 1),
-    0,
-    Math.PI * 2,
-  );
-  context.fill();
-};
-
-const drawWindowIcon = (
-  context: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  radius: number,
-) => {
-  const size = radius * 1.5;
-  const left = centerX - size / 2;
-  const top = centerY - size / 2;
-
-  context.strokeRect(left, top, size, size);
-  context.beginPath();
-  context.moveTo(centerX, top);
-  context.lineTo(centerX, top + size);
-  context.moveTo(left, centerY);
-  context.lineTo(left + size, centerY);
+  context.moveTo(centerX - offset, centerY - radius);
+  context.lineTo(centerX - offset, centerY + radius);
+  context.moveTo(centerX + offset, centerY - radius);
+  context.lineTo(centerX + offset, centerY + radius);
+  context.moveTo(centerX - radius, centerY - offset);
+  context.lineTo(centerX + radius, centerY - offset);
+  context.moveTo(centerX - radius, centerY + offset);
+  context.lineTo(centerX + radius, centerY + offset);
   context.stroke();
 };
 
-const drawStairsIcon = (
+const drawArrowIcon = (
   context: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   radius: number,
 ) => {
-  const step = radius / 2;
   const startX = centerX - radius;
-  const startY = centerY + radius;
+  const endX = centerX + radius;
+  const headX = centerX + radius * 0.28;
 
   context.beginPath();
-  context.moveTo(startX, startY);
-  context.lineTo(startX + step, startY);
-  context.lineTo(startX + step, startY - step);
-  context.lineTo(startX + step * 2, startY - step);
-  context.lineTo(startX + step * 2, startY - step * 2);
-  context.lineTo(startX + step * 3, startY - step * 2);
-  context.lineTo(startX + step * 3, startY - step * 3);
+  context.moveTo(startX, centerY);
+  context.lineTo(endX, centerY);
+  context.moveTo(headX, centerY - radius * 0.72);
+  context.lineTo(endX, centerY);
+  context.lineTo(headX, centerY + radius * 0.72);
   context.stroke();
 };
 
@@ -278,18 +269,18 @@ const drawTileIcon = (
   context.lineCap = 'round';
   context.lineJoin = 'round';
 
-  if (icon === 'star') {
+  if (icon === 'structure') {
+    drawStructureIcon(context, centerX, centerY, radius);
+  } else if (icon === 'star') {
     drawStarIcon(context, centerX, centerY, radius);
   } else if (icon === 'triangle') {
     drawTriangleIcon(context, centerX, centerY, radius);
-  } else if (icon === 'line') {
-    drawLineIcon(context, centerX, centerY, radius);
-  } else if (icon === 'door') {
-    drawDoorIcon(context, centerX, centerY, radius);
-  } else if (icon === 'window') {
-    drawWindowIcon(context, centerX, centerY, radius);
+  } else if (icon === 'plus') {
+    drawPlusIcon(context, centerX, centerY, radius);
+  } else if (icon === 'hash') {
+    drawHashIcon(context, centerX, centerY, radius);
   } else {
-    drawStairsIcon(context, centerX, centerY, radius);
+    drawArrowIcon(context, centerX, centerY, radius);
   }
 
   context.restore();

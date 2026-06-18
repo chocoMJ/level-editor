@@ -109,15 +109,7 @@ const defaultLevel: LevelData = {
       id: 'base',
       name: 'Base',
       order: 0,
-      tiles: [
-        { x: 1, y: 1, tileLabel: 'Tile 0' },
-        { x: 2, y: 1, tileLabel: 'Tile 0' },
-        { x: 3, y: 1, tileLabel: 'Tile 0' },
-        { x: 5, y: 3, tileLabel: 'Tile 0' },
-        { x: 6, y: 3, tileLabel: 'Tile 0' },
-        { x: 7, y: 3, tileLabel: 'Tile 0' },
-        { x: 8, y: 3, tileLabel: 'Tile 0' },
-      ],
+      tiles: [],
     },
   ],
 };

@@ -1,4 +1,5 @@
 import { computed } from 'nanostores';
+import { CV_SHAPE_PRESETS, TILE_ICON_PRESETS } from '@/helpers/constants';
 import {
   createUniqueTileLabel,
   getTileLabelKey,
@@ -23,20 +24,7 @@ import {
   normalizeTerrainTileFields,
 } from './terrain';
 
-export const CV_SHAPE_PRESETS = [
-  'structure',
-  'triangle',
-  'star',
-] as const satisfies readonly CvShape[];
-
-export const TILE_ICON_PRESETS = [
-  'star',
-  'triangle',
-  'line',
-  'door',
-  'window',
-  'stairs',
-] as const satisfies readonly TileIcon[];
+export { CV_SHAPE_PRESETS, TILE_ICON_PRESETS };
 
 export const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/u;
 
@@ -66,8 +54,23 @@ const iconColors = [
   '#ecfeff',
 ] as const;
 
+const tileIconByCvShape = {
+  structure: 'structure',
+  triangle: 'triangle',
+  star: 'star',
+  plus: 'plus',
+  hash: 'hash',
+  arrow: 'arrow',
+} as const satisfies Record<CvShape, TileIcon>;
+
 const randomItem = <T>(items: readonly T[]) =>
   items[Math.floor(Math.random() * items.length)] ?? items[0];
+
+const getPreferredTileIcon = (cvShapes: readonly CvShape[]) => {
+  const shape = cvShapes[0];
+
+  return shape ? tileIconByCvShape[shape] : null;
+};
 
 const cloneTileSource = (source: TilePlacement['source']) =>
   source ? { ...source } : undefined;
@@ -189,7 +192,7 @@ export const createRandomPaletteTile = (
   return {
     name: getNextTileName(tileTable),
     backgroundColor: randomItem(backgroundColors),
-    icon: randomItem(TILE_ICON_PRESETS),
+    icon: getPreferredTileIcon(cvShapes) ?? randomItem(TILE_ICON_PRESETS),
     iconColor: randomItem(iconColors),
     showBackground: true,
     showIcon: true,

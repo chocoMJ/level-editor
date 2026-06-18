@@ -371,6 +371,13 @@ const drawTileIcon = (
     y: rect.y + gridSize - y,
   });
 
+  if (tile.icon === 'structure') {
+    icon
+      .rect(rect.x + iconLeft, rect.y + gridSize - iconTop - size, size, size)
+      .stroke(stroke);
+    return icon;
+  }
+
   if (tile.icon === 'star') {
     const radius = size / 2;
     const innerRadius = radius * 0.45;
@@ -410,71 +417,66 @@ const drawTileIcon = (
     return icon;
   }
 
-  if (tile.icon === 'line') {
-    const start = toWorldPoint(iconLeft, centerY);
-    const end = toWorldPoint(iconLeft + size, centerY);
+  if (tile.icon === 'plus') {
+    const horizontalStart = toWorldPoint(iconLeft, centerY);
+    const horizontalEnd = toWorldPoint(iconLeft + size, centerY);
+    const verticalStart = toWorldPoint(centerX, iconTop);
+    const verticalEnd = toWorldPoint(centerX, iconTop + size);
 
     icon
-      .moveTo(start.x, start.y)
-      .lineTo(end.x, end.y)
-      .stroke({
-        ...stroke,
-        width: Math.max(lineWidth * 2.4, 2),
-      });
-    return icon;
-  }
-
-  if (tile.icon === 'door') {
-    const knob = toWorldPoint(iconLeft + size * 0.63, iconTop + size * 0.55);
-
-    icon
-      .rect(
-        rect.x + iconLeft + size * 0.2,
-        rect.y + gridSize - iconTop - size,
-        size * 0.6,
-        size,
-      )
-      .stroke(stroke)
-      .circle(knob.x, knob.y, Math.max(lineWidth * 1.5, 1.5))
-      .fill({ color, alpha });
-    return icon;
-  }
-
-  if (tile.icon === 'window') {
-    const top = toWorldPoint(centerX, iconTop);
-    const bottom = toWorldPoint(centerX, iconTop + size);
-    const left = toWorldPoint(iconLeft, centerY);
-    const right = toWorldPoint(iconLeft + size, centerY);
-
-    icon
-      .rect(iconLeft + rect.x, rect.y + gridSize - iconTop - size, size, size)
-      .stroke(stroke)
-      .moveTo(top.x, top.y)
-      .lineTo(bottom.x, bottom.y)
-      .moveTo(left.x, left.y)
-      .lineTo(right.x, right.y)
+      .moveTo(horizontalStart.x, horizontalStart.y)
+      .lineTo(horizontalEnd.x, horizontalEnd.y)
+      .moveTo(verticalStart.x, verticalStart.y)
+      .lineTo(verticalEnd.x, verticalEnd.y)
       .stroke(stroke);
     return icon;
   }
 
-  const step = size / 3;
-  const points = [
-    toWorldPoint(iconLeft, iconTop + size),
-    toWorldPoint(iconLeft + step, iconTop + size),
-    toWorldPoint(iconLeft + step, iconTop + step * 2),
-    toWorldPoint(iconLeft + step * 2, iconTop + step * 2),
-    toWorldPoint(iconLeft + step * 2, iconTop + step),
-    toWorldPoint(iconLeft + size, iconTop + step),
-  ];
+  if (tile.icon === 'hash') {
+    const firstX = iconLeft + size * 0.34;
+    const secondX = iconLeft + size * 0.66;
+    const firstY = iconTop + size * 0.34;
+    const secondY = iconTop + size * 0.66;
+    const topLeft = toWorldPoint(firstX, iconTop);
+    const bottomLeft = toWorldPoint(firstX, iconTop + size);
+    const topRight = toWorldPoint(secondX, iconTop);
+    const bottomRight = toWorldPoint(secondX, iconTop + size);
+    const leftTop = toWorldPoint(iconLeft, firstY);
+    const rightTop = toWorldPoint(iconLeft + size, firstY);
+    const leftBottom = toWorldPoint(iconLeft, secondY);
+    const rightBottom = toWorldPoint(iconLeft + size, secondY);
 
-  icon
-    .moveTo(points[0].x, points[0].y)
-    .lineTo(points[1].x, points[1].y)
-    .lineTo(points[2].x, points[2].y)
-    .lineTo(points[3].x, points[3].y)
-    .lineTo(points[4].x, points[4].y)
-    .lineTo(points[5].x, points[5].y)
-    .stroke(stroke);
+    icon
+      .moveTo(topLeft.x, topLeft.y)
+      .lineTo(bottomLeft.x, bottomLeft.y)
+      .moveTo(topRight.x, topRight.y)
+      .lineTo(bottomRight.x, bottomRight.y)
+      .moveTo(leftTop.x, leftTop.y)
+      .lineTo(rightTop.x, rightTop.y)
+      .moveTo(leftBottom.x, leftBottom.y)
+      .lineTo(rightBottom.x, rightBottom.y)
+      .stroke(stroke);
+    return icon;
+  }
+
+  if (tile.icon === 'arrow') {
+    const start = toWorldPoint(iconLeft, centerY);
+    const tip = toWorldPoint(iconLeft + size, centerY);
+    const headTop = toWorldPoint(iconLeft + size * 0.64, iconTop + size * 0.22);
+    const headBottom = toWorldPoint(
+      iconLeft + size * 0.64,
+      iconTop + size * 0.78,
+    );
+
+    icon
+      .moveTo(start.x, start.y)
+      .lineTo(tip.x, tip.y)
+      .moveTo(headTop.x, headTop.y)
+      .lineTo(tip.x, tip.y)
+      .lineTo(headBottom.x, headBottom.y)
+      .stroke(stroke);
+    return icon;
+  }
 
   return icon;
 };

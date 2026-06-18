@@ -13,16 +13,23 @@ const finiteNumberSchema = z.number().finite();
 const hexColorSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/u);
 
 export const TileIconSchema = z.enum([
-  'star',
+  'structure',
   'triangle',
-  'line',
-  'door',
-  'window',
-  'stairs',
+  'star',
+  'plus',
+  'hash',
+  'arrow',
 ]);
 export type TileIcon = z.infer<typeof TileIconSchema>;
 
-export const CvShapeSchema = z.enum(['structure', 'triangle', 'star']);
+export const CvShapeSchema = z.enum([
+  'structure',
+  'triangle',
+  'star',
+  'plus',
+  'hash',
+  'arrow',
+]);
 export type CvShape = z.infer<typeof CvShapeSchema>;
 
 export const TerrainExportTileLabelsSchema = z.object({
